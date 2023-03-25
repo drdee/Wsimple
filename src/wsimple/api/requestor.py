@@ -38,6 +38,8 @@ def requestor(
     elif r.status_code >= 500:
         raise WealthsimpleServerError
     else:
+        print(r)
+        breakpoint()
         if request_status:
             return Box(json.loads(r.content))
         elif response_list:

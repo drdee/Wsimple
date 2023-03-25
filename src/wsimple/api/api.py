@@ -6,6 +6,7 @@ File Name: api/api.py
 
 #!/usr/bin/env python3
 # standard library
+import os
 import sys
 import json
 from datetime import datetime, timedelta
@@ -24,6 +25,7 @@ from .tokens import TokensBox
 import requests
 from box import Box
 from loguru import logger
+from fastapi import FastAPI, APIRouter
 
 logger.remove()
 
@@ -186,6 +188,60 @@ class Wsimple:
                     else:
                         self.logger.debug(r.json())
                         raise LoginError
+        self.router = APIRouter()
+        self.router.add_api_route("/get_accounts", self.get_accounts, methods=["GET"])
+        self.router.add_api_route("/add_watchlist", self.add_watchlist, methods=["POST"])
+        self.router.add_api_route("/cancel_order", self.cancel_order, methods=["POST"])
+        self.router.add_api_route("/create_internal_transfer", self.create_internal_transfer, methods=["POST"])
+        self.router.add_api_route("/delete_deposit", self.delete_deposit, methods=["POST"])
+        self.router.add_api_route("/delete_watchlist", self.delete_watchlist, methods=["POST"])
+        self.router.add_api_route("/delete_withdrawal", self.delete_withdrawal, methods=["POST"])
+        self.router.add_api_route("/stock", self.stock, methods=["GET"])
+        self.router.add_api_route("/find_securities_by_id", self.find_securities_by_id, methods=["GET"])
+        self.router.add_api_route("/find_securities_by_id_historical", self.find_securities_by_id_historical, methods=["GET"])
+        self.router.add_api_route("/get_account", self.get_account, methods=["GET"])
+        self.router.add_api_route("/get_historical_portfolio_data", self.get_historical_portfolio_data, methods=["GET"])
+        self.router.add_api_route("/get_activities", self.get_activities, methods=["GET"])
+        self.router.add_api_route("/get_all_securities_groups", self.get_all_securities_groups, methods=["GET"])
+        self.router.add_api_route("/get_all_markets", self.get_all_markets, methods=["GET"])
+        self.router.add_api_route("/get_bank_accounts", self.get_bank_accounts, methods=["GET"])
+        self.router.add_api_route("/get_deposit", self.get_deposit, methods=["GET"])
+        self.router.add_api_route("/get_exchange_rate", self.get_exchange_rate, methods=["GET"])
+        self.router.add_api_route("/get_fact_sheets", self.get_fact_sheets, methods=["GET"])
+        self.router.add_api_route("/get_featured_security_groups", self.get_featured_security_groups, methods=["GET"])
+        self.router.add_api_route("/get_global_alerts", self.get_global_alerts, methods=["GET"])
+        self.router.add_api_route("/get_me", self.get_me, methods=["GET"])
+        self.router.add_api_route("/get_mobile_dashboard", self.get_mobile_dashboard, methods=["GET"])
+        self.router.add_api_route("/get_monthly_statements", self.get_monthly_statements, methods=["GET"])
+        self.router.add_api_route("/get_most_watched_securities", self.get_most_watched_securities, methods=["GET"])
+        self.router.add_api_route("/get_orders", self.get_orders, methods=["GET"])
+        self.router.add_api_route("/get_person", self.get_person, methods=["GET"])
+        self.router.add_api_route("/get_positions", self.get_positions, methods=["GET"])
+        self.router.add_api_route("/get_securities_in_groups", self.get_securities_in_groups, methods=["GET"])
+        self.router.add_api_route("/get_supported_internal_transfers", self.get_supported_internal_transfers, methods=["GET"])
+        self.router.add_api_route("/get_tax_documents", self.get_tax_documents, methods=["GET"])
+        self.router.add_api_route("/get_top_losers_securities", self.get_top_losers_securities, methods=["GET"])
+        self.router.add_api_route("/get_top_gainers_securities", self.get_top_gainers_securities, methods=["GET"])
+        self.router.add_api_route("/get_most_active_securities", self.get_most_active_securities, methods=["GET"])
+        self.router.add_api_route("/get_monthly_statements_url", self.get_monthly_statements_url, methods=["GET"])
+        self.router.add_api_route("/get_user_alerts", self.get_user_alerts, methods=["GET"])
+        self.router.add_api_route("/get_watchlist", self.get_watchlist, methods=["GET"])
+        self.router.add_api_route("/get_websocket_uri", self.get_websocket_uri, methods=["GET"])
+        self.router.add_api_route("/get_withdrawal", self.get_withdrawal, methods=["GET"])
+        self.router.add_api_route("/list_deposits", self.list_deposits, methods=["GET"])
+        self.router.add_api_route("/list_withdrawals", self.list_withdrawals, methods=["GET"])
+        self.router.add_api_route("/make_deposit", self.make_deposit, methods=["POST"])
+        self.router.add_api_route("/make_withdrawal", self.make_withdrawal, methods=["POST"])
+        self.router.add_api_route("/public_find_securities_by_ticker", self.public_find_securities_by_ticker, methods=["GET"])
+        self.router.add_api_route("/public_find_securities_by_ticker_historical", self.public_find_securities_by_ticker_historical, methods=["GET"])
+        self.router.add_api_route("/public_top_traded", self.public_top_traded, methods=["GET"])
+        self.router.add_api_route("/market_buy_order", self.market_buy_order, methods=["POST"])
+        self.router.add_api_route("/limit_buy_order", self.limit_buy_order, methods=["POST"])
+        self.router.add_api_route("/stop_limit_buy_order", self.stop_limit_buy_order, methods=["POST"])
+        self.router.add_api_route("/market_sell_order", self.market_sell_order, methods=["POST"])
+        self.router.add_api_route("/limit_sell_order", self.limit_sell_order, methods=["POST"])
+        self.router.add_api_route("/stop_limit_sell_order", self.stop_limit_sell_order, methods=["POST"])
+
 
     def refresh_token(self, tokens=None):
         """
@@ -1199,7 +1255,7 @@ class Wsimple:
         )
 
     @_manage_tokens
-    def create_internal_transfers(self, payload, tokens=None):
+    def create_internal_transfer(self, payload, tokens=None):
         """
         create a internal transfer request
         currently no wrapper functions.
@@ -1532,3 +1588,13 @@ class Wsimple:
             request_status=True,
             logger=self.logger,
         )
+
+
+app = FastAPI()
+
+def get_otp():
+    return input("Enter otpnumber: \n>>>")
+
+ws = Wsimple(os.environ['ws_email'], os.environ['ws_password'], otp_callback=get_otp)
+
+app.include_router(ws.router)
