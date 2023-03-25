@@ -26,6 +26,7 @@ import requests
 from box import Box
 from loguru import logger
 from fastapi import FastAPI, APIRouter
+from fastapi.staticfiles import StaticFiles
 
 logger.remove()
 
@@ -1590,7 +1591,7 @@ class Wsimple:
         )
 
 
-app = FastAPI()
+app = FastAPI(openapi_url="/api/v1/openapi.json")
 
 def get_otp():
     return input("Enter otpnumber: \n>>>")
@@ -1598,3 +1599,4 @@ def get_otp():
 ws = Wsimple(os.environ['ws_email'], os.environ['ws_password'], otp_callback=get_otp)
 
 app.include_router(ws.router)
+app.mount("/.well-known", StaticFiles(directory=".well-known", html=False), name=".well-known")

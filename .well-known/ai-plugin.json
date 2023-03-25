@@ -1,0 +1,17 @@
+{ "schema_version": "v1",
+  "name_for_model": "WSTrade",
+  "name_for_human": "Wealthsimple Trade",
+  "description_for_human": "Wsimple: is a API and Web interface for Wealthsimple Trade",
+  "description_for_model": "Use the Wealthsimple plugin to manage your trade account, buy and sell stocks and fund your accounts.",
+  "api": {
+    "type": "openapi",
+    "url": "http://127.0.0.1:8000/api/v1/openapi.json",
+    "has_user_authentication": false
+  },
+  "auth": {
+    "type": "none"
+  },
+  "logo_url": "https://www.wealthsimple.com/static/ws-wordmark-refresh-aefa986e4074a84f853576304d0c9763.svg",
+  "contact_email": "data@wealthsimple.com",
+  "legal_info_url": "https://www.wealthsimple.com/en-ca/legal/terms"
+}
