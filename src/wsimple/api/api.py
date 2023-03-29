@@ -6,11 +6,12 @@ File Name: api/api.py
 
 #!/usr/bin/env python3
 # standard library
+from functools import wraps
 import os
 import sys
 import json
 from datetime import datetime, timedelta
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, List
 
 # custom error
 from .errors import LoginError
@@ -27,8 +28,17 @@ from box import Box
 from loguru import logger
 from fastapi import FastAPI, APIRouter
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 logger.remove()
+
+class Deposit(BaseModel):
+    amount: Union[int, float]
+    bank_account_id: Optional[str] = None
+    account_id: Optional[str] = None
+
+class Token(BaseModel):
+    tokens: Optional[List] = None
 
 
 class Wsimple:
@@ -191,57 +201,57 @@ class Wsimple:
                         raise LoginError
         self.router = APIRouter()
         self.router.add_api_route("/get_accounts", self.get_accounts, methods=["GET"])
-        self.router.add_api_route("/add_watchlist", self.add_watchlist, methods=["POST"])
-        self.router.add_api_route("/cancel_order", self.cancel_order, methods=["POST"])
-        self.router.add_api_route("/create_internal_transfer", self.create_internal_transfer, methods=["POST"])
-        self.router.add_api_route("/delete_deposit", self.delete_deposit, methods=["POST"])
-        self.router.add_api_route("/delete_watchlist", self.delete_watchlist, methods=["POST"])
-        self.router.add_api_route("/delete_withdrawal", self.delete_withdrawal, methods=["POST"])
+        #self.router.add_api_route("/add_watchlist", self.add_watchlist, methods=["POST"])
+        #self.router.add_api_route("/cancel_order", self.cancel_order, methods=["POST"])
+        #self.router.add_api_route("/create_internal_transfer", self.create_internal_transfer, methods=["POST"])
+        #self.router.add_api_route("/delete_deposit", self.delete_deposit, methods=["POST"])
+        #self.router.add_api_route("/delete_watchlist", self.delete_watchlist, methods=["POST"])
+        #self.router.add_api_route("/delete_withdrawal", self.delete_withdrawal, methods=["POST"])
         self.router.add_api_route("/stock", self.stock, methods=["GET"])
-        self.router.add_api_route("/find_securities_by_id", self.find_securities_by_id, methods=["GET"])
-        self.router.add_api_route("/find_securities_by_id_historical", self.find_securities_by_id_historical, methods=["GET"])
+        #self.router.add_api_route("/find_securities_by_id", self.find_securities_by_id, methods=["GET"])
+        #self.router.add_api_route("/find_securities_by_id_historical", self.find_securities_by_id_historical, methods=["GET"])
         self.router.add_api_route("/get_account", self.get_account, methods=["GET"])
-        self.router.add_api_route("/get_historical_portfolio_data", self.get_historical_portfolio_data, methods=["GET"])
-        self.router.add_api_route("/get_activities", self.get_activities, methods=["GET"])
-        self.router.add_api_route("/get_all_securities_groups", self.get_all_securities_groups, methods=["GET"])
-        self.router.add_api_route("/get_all_markets", self.get_all_markets, methods=["GET"])
-        self.router.add_api_route("/get_bank_accounts", self.get_bank_accounts, methods=["GET"])
+        #self.router.add_api_route("/get_historical_portfolio_data", self.get_historical_portfolio_data, methods=["GET"])
+        #self.router.add_api_route("/get_activities", self.get_activities, methods=["GET"])
+        #self.router.add_api_route("/get_all_securities_groups", self.get_all_securities_groups, methods=["GET"])
+        #self.router.add_api_route("/get_all_markets", self.get_all_markets, methods=["GET"])
+        #self.router.add_api_route("/get_bank_accounts", self.get_bank_accounts, methods=["GET"])
         self.router.add_api_route("/get_deposit", self.get_deposit, methods=["GET"])
-        self.router.add_api_route("/get_exchange_rate", self.get_exchange_rate, methods=["GET"])
-        self.router.add_api_route("/get_fact_sheets", self.get_fact_sheets, methods=["GET"])
-        self.router.add_api_route("/get_featured_security_groups", self.get_featured_security_groups, methods=["GET"])
-        self.router.add_api_route("/get_global_alerts", self.get_global_alerts, methods=["GET"])
+        #self.router.add_api_route("/get_exchange_rate", self.get_exchange_rate, methods=["GET"])
+        #self.router.add_api_route("/get_fact_sheets", self.get_fact_sheets, methods=["GET"])
+        #self.router.add_api_route("/get_featured_security_groups", self.get_featured_security_groups, methods=["GET"])
+        #self.router.add_api_route("/get_global_alerts", self.get_global_alerts, methods=["GET"])
         self.router.add_api_route("/get_me", self.get_me, methods=["GET"])
-        self.router.add_api_route("/get_mobile_dashboard", self.get_mobile_dashboard, methods=["GET"])
-        self.router.add_api_route("/get_monthly_statements", self.get_monthly_statements, methods=["GET"])
-        self.router.add_api_route("/get_most_watched_securities", self.get_most_watched_securities, methods=["GET"])
-        self.router.add_api_route("/get_orders", self.get_orders, methods=["GET"])
-        self.router.add_api_route("/get_person", self.get_person, methods=["GET"])
-        self.router.add_api_route("/get_positions", self.get_positions, methods=["GET"])
-        self.router.add_api_route("/get_securities_in_groups", self.get_securities_in_groups, methods=["GET"])
-        self.router.add_api_route("/get_supported_internal_transfers", self.get_supported_internal_transfers, methods=["GET"])
-        self.router.add_api_route("/get_tax_documents", self.get_tax_documents, methods=["GET"])
-        self.router.add_api_route("/get_top_losers_securities", self.get_top_losers_securities, methods=["GET"])
-        self.router.add_api_route("/get_top_gainers_securities", self.get_top_gainers_securities, methods=["GET"])
-        self.router.add_api_route("/get_most_active_securities", self.get_most_active_securities, methods=["GET"])
-        self.router.add_api_route("/get_monthly_statements_url", self.get_monthly_statements_url, methods=["GET"])
-        self.router.add_api_route("/get_user_alerts", self.get_user_alerts, methods=["GET"])
-        self.router.add_api_route("/get_watchlist", self.get_watchlist, methods=["GET"])
-        self.router.add_api_route("/get_websocket_uri", self.get_websocket_uri, methods=["GET"])
+        #self.router.add_api_route("/get_mobile_dashboard", self.get_mobile_dashboard, methods=["GET"])
+        #self.router.add_api_route("/get_monthly_statements", self.get_monthly_statements, methods=["GET"])
+        #self.router.add_api_route("/get_most_watched_securities", self.get_most_watched_securities, methods=["GET"])
+        #self.router.add_api_route("/get_orders", self.get_orders, methods=["GET"])
+        #self.router.add_api_route("/get_person", self.get_person, methods=["GET"])
+        #self.router.add_api_route("/get_positions", self.get_positions, methods=["GET"])
+        #self.router.add_api_route("/get_securities_in_groups", self.get_securities_in_groups, methods=["GET"])
+        #self.router.add_api_route("/get_supported_internal_transfers", self.get_supported_internal_transfers, methods=["GET"])
+        #self.router.add_api_route("/get_tax_documents", self.get_tax_documents, methods=["GET"])
+        #self.router.add_api_route("/get_top_losers_securities", self.get_top_losers_securities, methods=["GET"])
+        #self.router.add_api_route("/get_top_gainers_securities", self.get_top_gainers_securities, methods=["GET"])
+        #self.router.add_api_route("/get_most_active_securities", self.get_most_active_securities, methods=["GET"])
+        #self.router.add_api_route("/get_monthly_statements_url", self.get_monthly_statements_url, methods=["GET"])
+        #self.router.add_api_route("/get_user_alerts", self.get_user_alerts, methods=["GET"])
+        #self.router.add_api_route("/get_watchlist", self.get_watchlist, methods=["GET"])
+        #self.router.add_api_route("/get_websocket_uri", self.get_websocket_uri, methods=["GET"])
         self.router.add_api_route("/get_withdrawal", self.get_withdrawal, methods=["GET"])
         self.router.add_api_route("/list_deposits", self.list_deposits, methods=["GET"])
         self.router.add_api_route("/list_withdrawals", self.list_withdrawals, methods=["GET"])
-        self.router.add_api_route("/make_deposit", self.make_deposit, methods=["POST"])
+        self.router.add_api_route("/make_deposit", self.make_deposit, methods=["POST"], summary='Make a deposit to your Wealthsimple Trade account. Only required parameter is amount.')
         self.router.add_api_route("/make_withdrawal", self.make_withdrawal, methods=["POST"])
-        self.router.add_api_route("/public_find_securities_by_ticker", self.public_find_securities_by_ticker, methods=["GET"])
-        self.router.add_api_route("/public_find_securities_by_ticker_historical", self.public_find_securities_by_ticker_historical, methods=["GET"])
-        self.router.add_api_route("/public_top_traded", self.public_top_traded, methods=["GET"])
-        self.router.add_api_route("/market_buy_order", self.market_buy_order, methods=["POST"])
-        self.router.add_api_route("/limit_buy_order", self.limit_buy_order, methods=["POST"])
-        self.router.add_api_route("/stop_limit_buy_order", self.stop_limit_buy_order, methods=["POST"])
-        self.router.add_api_route("/market_sell_order", self.market_sell_order, methods=["POST"])
-        self.router.add_api_route("/limit_sell_order", self.limit_sell_order, methods=["POST"])
-        self.router.add_api_route("/stop_limit_sell_order", self.stop_limit_sell_order, methods=["POST"])
+        #self.router.add_api_route("/public_find_securities_by_ticker", self.public_find_securities_by_ticker, methods=["GET"])
+        #self.router.add_api_route("/public_find_securities_by_ticker_historical", self.public_find_securities_by_ticker_historical, methods=["GET"])
+        #self.router.add_api_route("/public_top_traded", self.public_top_traded, methods=["GET"])
+        #self.router.add_api_route("/market_buy_order", self.market_buy_order, methods=["POST"])
+        #self.router.add_api_route("/limit_buy_order", self.limit_buy_order, methods=["POST"])
+        #self.router.add_api_route("/stop_limit_buy_order", self.stop_limit_buy_order, methods=["POST"])
+        #self.router.add_api_route("/market_sell_order", self.market_sell_order, methods=["POST"])
+        #self.router.add_api_route("/limit_sell_order", self.limit_sell_order, methods=["POST"])
+        #self.router.add_api_route("/stop_limit_sell_order", self.stop_limit_sell_order, methods=["POST"])
 
 
     def refresh_token(self, tokens=None):
@@ -291,6 +301,8 @@ class Wsimple:
         return wsimple
      
     def _manage_tokens(f):
+        print(f'Entering {f}')
+        @wraps(f)
         def wrap_manage_tokens(self, *args, **kwargs):
             self.logger.info(f"Tokens: {self.box} {args} {kwargs}")
             if self.internally_manage_tokens:
@@ -911,28 +923,31 @@ class Wsimple:
     @_manage_tokens
     def make_deposit(
         self,
-        amount: Union[int, float],
-        tokens=None,
-        bank_account_id: Optional[str] = None,
-        account_id: Optional[str] = None,
+        deposit: Deposit,
+        # tokens: Token = None
+        # amount: Union[int, float],
+        tokens=None
+        # bank_account_id: Optional[str] = None,
+        # account_id: Optional[str] = None,
     ):
         """
-        Make a deposit under your Wealthsimple Trade account.
-        Where ***amount*** is the amount to deposit
-        Where ***bank_account_id*** is id of bank account.
-        Where ***account_id*** is id of the account.
+        Make a deposit to your Wealthsimple Trade account. Only required parameter is amount.
         """
+        #Where ***amount*** is the amount to deposit
+        #Where ***bank_account_id*** is id of bank account.
+        #Where ***account_id*** is id of the account.
+
         self.logger.debug("make_deposits")
-        if bank_account_id == None:
-            bank_account_id = self.get_bank_accounts(tokens=tokens)["results"][0]["id"]
-        if account_id == None:
-            account_id = self.accounts(tokens=tokens).personal
+        if deposit.bank_account_id == None:
+            deposit.bank_account_id = self.get_bank_accounts(tokens=tokens)["results"][0]["id"]
+        if deposit.account_id == None:
+            deposit.account_id = self.accounts(tokens=tokens).personal
         person = self.get_me(tokens=tokens)
         payload = {
             "client_id": str(person["id"]),
-            "bank_account_id": str(bank_account_id),
-            "account_id": str(account_id),
-            "amount": float(amount),
+            "bank_account_id": str(deposit.bank_account_id),
+            "account_id": str(deposit.account_id),
+            "amount": float(deposit.amount),
             "currency": "CAD",
         }
         return requestor(
